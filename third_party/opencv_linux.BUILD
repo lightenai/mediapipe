@@ -13,12 +13,12 @@ cc_library(
     name = "opencv",
     srcs = glob(
         [
-            "lib/x86_64-linux-gnu/libopencv_core.so",
-            "lib/x86_64-linux-gnu/libopencv_highgui.so",
-            "lib/x86_64-linux-gnu/libopencv_imgcodecs.so",
-            "lib/x86_64-linux-gnu/libopencv_imgproc.so",
-            "lib/x86_64-linux-gnu/libopencv_video.so",
-            "lib/x86_64-linux-gnu/libopencv_videoio.so",
+            "lib/libopencv_core.so.3*",
+            "lib/libopencv_highgui.so.3*",
+            "lib/libopencv_imgcodecs.so.3*",
+            "lib/libopencv_imgproc.so.3*",
+            "lib/libopencv_video.so.3*",
+            "lib/libopencv_videoio.so.3*",
         ],
     ),
     hdrs = glob(["include/opencv2/**/*.h*"]),

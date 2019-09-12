@@ -126,7 +126,7 @@ tf_workspace(tf_repo_name = "org_tensorflow")
 new_local_repository(
     name = "linux_opencv",
     build_file = "@//third_party:opencv_linux.BUILD",
-    path = "/usr",
+    path = "/usr/local",
 )
 
 new_local_repository(
@@ -240,10 +240,14 @@ maven_jar(
 # You may run setup_android.sh to install Android SDK and NDK.
 android_ndk_repository(
     name = "androidndk",
+    path = "/home/dragonly/tmp/build-opencv-for-android/android-ndk-downloader/android-ndk-r18b",
+    api_level = 28,
 )
 
 android_sdk_repository(
     name = "androidsdk",
+    path = "/home/dragonly/Android/Sdk",
+    api_level = 28,
 )
 
 # iOS basic build deps.
