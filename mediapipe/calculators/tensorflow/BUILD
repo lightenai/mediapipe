@@ -105,6 +105,17 @@ proto_library(
 )
 
 proto_library(
+    name = "unpack_media_sequence_calculator_proto",
+    srcs = ["unpack_media_sequence_calculator.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//mediapipe/calculators/core:packet_resampler_calculator_proto",
+        "//mediapipe/framework:calculator_proto",
+        "//mediapipe/util:audio_decoder_proto",
+    ],
+)
+
+proto_library(
     name = "vector_float_to_tensor_calculator_options_proto",
     srcs = ["vector_float_to_tensor_calculator_options.proto"],
     visibility = ["//visibility:public"],
@@ -255,9 +266,21 @@ mediapipe_cc_proto_library(
     cc_deps = [
         "//mediapipe/calculators/core:packet_resampler_calculator_cc_proto",
         "//mediapipe/framework:calculator_cc_proto",
+        "//mediapipe/util:audio_decoder_cc_proto",
     ],
     visibility = ["//visibility:public"],
     deps = [":unpack_media_sequence_calculator_proto"],
+)
+
+mediapipe_cc_proto_library(
+    name = "vector_int_to_tensor_calculator_options_cc_proto",
+    srcs = ["vector_int_to_tensor_calculator_options.proto"],
+    cc_deps = [
+        "//mediapipe/framework:calculator_cc_proto",
+        "@org_tensorflow//tensorflow/core:protos_all_cc",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":vector_int_to_tensor_calculator_options_proto"],
 )
 
 mediapipe_cc_proto_library(
@@ -621,6 +644,22 @@ cc_library(
 )
 
 cc_library(
+    name = "tfrecord_reader_calculator",
+    srcs = ["tfrecord_reader_calculator.cc"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/port:integral_types",
+        "//mediapipe/framework/port:logging",
+        "//mediapipe/framework/port:ret_check",
+        "//mediapipe/framework/port:status",
+        "@org_tensorflow//tensorflow/core:lib",
+        "@org_tensorflow//tensorflow/core:protos_all_cc",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
     name = "tensor_to_vector_float_calculator",
     srcs = ["tensor_to_vector_float_calculator.cc"],
     visibility = ["//visibility:public"],
@@ -653,9 +692,24 @@ cc_library(
         "//mediapipe/framework/formats:location",
         "//mediapipe/framework/port:ret_check",
         "//mediapipe/framework/port:status",
+        "//mediapipe/util:audio_decoder_cc_proto",
         "//mediapipe/util/sequence:media_sequence",
         "@com_google_absl//absl/strings",
         "@org_tensorflow//tensorflow/core:protos_all_cc",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
+    name = "vector_int_to_tensor_calculator",
+    srcs = ["vector_int_to_tensor_calculator.cc"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":vector_int_to_tensor_calculator_options_cc_proto",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/port:ret_check",
+        "//mediapipe/framework/port:status",
+        "@org_tensorflow//tensorflow/core:framework",
     ],
     alwayslink = 1,
 )
@@ -670,6 +724,20 @@ cc_library(
         "//mediapipe/framework/port:ret_check",
         "//mediapipe/framework/port:status",
         "@org_tensorflow//tensorflow/core:framework",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
+    name = "unpack_yt8m_sequence_example_calculator",
+    srcs = ["unpack_yt8m_sequence_example_calculator.cc"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//mediapipe/calculators/tensorflow:lapped_tensor_buffer_calculator_cc_proto",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework:packet",
+        "//mediapipe/framework/port:status",
+        "@org_tensorflow//tensorflow/core:protos_all_cc",
     ],
     alwayslink = 1,
 )
@@ -769,7 +837,6 @@ cc_test(
         "//mediapipe/framework/formats:location",
         "//mediapipe/framework/port:gtest_main",
         "//mediapipe/framework/port:opencv_imgcodecs",
-        "//mediapipe/framework/port:status",
         "//mediapipe/util/sequence:media_sequence",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/strings",
@@ -971,9 +1038,24 @@ cc_test(
         "//mediapipe/framework/formats:location",
         "//mediapipe/framework/port:gtest_main",
         "//mediapipe/framework/port:rectangle",
+        "//mediapipe/util:audio_decoder_cc_proto",
         "//mediapipe/util/sequence:media_sequence",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/strings",
+        "@org_tensorflow//tensorflow/core:protos_all_cc",
+    ],
+)
+
+cc_test(
+    name = "vector_int_to_tensor_calculator_test",
+    srcs = ["vector_int_to_tensor_calculator_test.cc"],
+    deps = [
+        ":vector_int_to_tensor_calculator",
+        ":vector_int_to_tensor_calculator_options_cc_proto",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework:calculator_runner",
+        "//mediapipe/framework/port:gtest_main",
+        "@org_tensorflow//tensorflow/core:framework",
         "@org_tensorflow//tensorflow/core:protos_all_cc",
     ],
 )

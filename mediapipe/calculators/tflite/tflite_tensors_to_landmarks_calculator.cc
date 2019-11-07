@@ -21,7 +21,8 @@
 namespace mediapipe {
 
 // A calculator for converting TFLite tensors from regression models into
-// landmarks.
+// landmarks. Note that if the landmarks in the tensor has more than 3
+// dimensions, only the first 3 dimensions will be converted to x,y,z.
 //
 // Input:
 //  TENSORS - Vector of TfLiteTensor of type kTfLiteFloat32. Only the first
@@ -96,7 +97,8 @@ REGISTER_CALCULATOR(TfLiteTensorsToLandmarksCalculator);
               options_.has_input_image_width())
         << "Must provide input with/height for getting normalized landmarks.";
   }
-  if (cc->Outputs().HasTag("LANDMARKS") && options_.flip_vertically()) {
+  if (cc->Outputs().HasTag("LANDMARKS") &&
+      (options_.flip_vertically() || options_.flip_horizontally())) {
     RET_CHECK(options_.has_input_image_height() &&
               options_.has_input_image_width())
         << "Must provide input with/height for using flip_vertically option "
@@ -121,9 +123,6 @@ REGISTER_CALCULATOR(TfLiteTensorsToLandmarksCalculator);
     num_values *= raw_tensor->dims->data[i];
   }
   const int num_dimensions = num_values / num_landmarks_;
-  // Landmarks must have less than 3 dimensions. Otherwise please consider
-  // using matrix.
-  CHECK_LE(num_dimensions, 3);
   CHECK_GT(num_dimensions, 0);
 
   const float* raw_landmarks = raw_tensor->data.f;
@@ -133,7 +132,12 @@ REGISTER_CALCULATOR(TfLiteTensorsToLandmarksCalculator);
   for (int ld = 0; ld < num_landmarks_; ++ld) {
     const int offset = ld * num_dimensions;
     Landmark landmark;
-    landmark.set_x(raw_landmarks[offset]);
+
+    if (options_.flip_horizontally()) {
+      landmark.set_x(options_.input_image_width() - raw_landmarks[offset]);
+    } else {
+      landmark.set_x(raw_landmarks[offset]);
+    }
     if (num_dimensions > 1) {
       if (options_.flip_vertically()) {
         landmark.set_y(options_.input_image_height() -

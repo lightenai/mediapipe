@@ -14,7 +14,7 @@
 
 licenses(["notice"])  # Apache 2.0
 
-package(default_visibility = ["//visibility:private"])
+package(default_visibility = ["//visibility:public"])
 
 exports_files(["LICENSE"])
 
@@ -234,20 +234,15 @@ cc_library(
         "//mediapipe/framework/port:status",
         "//mediapipe/framework/port:vector",
         "//mediapipe/util:annotation_renderer",
+        "//mediapipe/util:render_data_cc_proto",
     ] + select({
-        "//mediapipe:android": [
+        "//mediapipe/gpu:disable_gpu": [],
+        "//conditions:default": [
             "//mediapipe/gpu:gl_calculator_helper",
             "//mediapipe/gpu:gl_simple_shaders",
             "//mediapipe/gpu:gpu_buffer",
             "//mediapipe/gpu:shader_util",
         ],
-        "//mediapipe:ios": [
-            "//mediapipe/gpu:gl_calculator_helper",
-            "//mediapipe/gpu:gl_simple_shaders",
-            "//mediapipe/gpu:gpu_buffer",
-            "//mediapipe/gpu:shader_util",
-        ],
-        "//conditions:default": [],
     }),
     alwayslink = 1,
 )
@@ -367,6 +362,16 @@ mediapipe_cc_proto_library(
 )
 
 mediapipe_cc_proto_library(
+    name = "landmarks_to_floats_calculator_cc_proto",
+    srcs = ["landmarks_to_floats_calculator.proto"],
+    cc_deps = [
+        "//mediapipe/framework:calculator_cc_proto",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":landmarks_to_floats_calculator_proto"],
+)
+
+mediapipe_cc_proto_library(
     name = "rect_transformation_calculator_cc_proto",
     srcs = ["rect_transformation_calculator.proto"],
     cc_deps = [
@@ -378,7 +383,12 @@ mediapipe_cc_proto_library(
 
 cc_library(
     name = "detections_to_rects_calculator",
-    srcs = ["detections_to_rects_calculator.cc"],
+    srcs = [
+        "detections_to_rects_calculator.cc",
+    ],
+    hdrs = [
+        "detections_to_rects_calculator.h",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":detections_to_rects_calculator_cc_proto",
@@ -461,6 +471,17 @@ proto_library(
 )
 
 proto_library(
+    name = "labels_to_render_data_calculator_proto",
+    srcs = ["labels_to_render_data_calculator.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//mediapipe/framework:calculator_proto",
+        "//mediapipe/util:color_proto",
+        "//mediapipe/util:render_data_proto",
+    ],
+)
+
+proto_library(
     name = "thresholding_calculator_proto",
     srcs = ["thresholding_calculator.proto"],
     visibility = ["//visibility:public"],
@@ -483,6 +504,15 @@ proto_library(
 proto_library(
     name = "landmark_projection_calculator_proto",
     srcs = ["landmark_projection_calculator.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//mediapipe/framework:calculator_proto",
+    ],
+)
+
+proto_library(
+    name = "landmarks_to_floats_calculator_proto",
+    srcs = ["landmarks_to_floats_calculator.proto"],
     visibility = ["//visibility:public"],
     deps = [
         "//mediapipe/framework:calculator_proto",
@@ -584,6 +614,26 @@ cc_library(
 )
 
 cc_library(
+    name = "labels_to_render_data_calculator",
+    srcs = ["labels_to_render_data_calculator.cc"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":labels_to_render_data_calculator_cc_proto",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework:calculator_options_cc_proto",
+        "//mediapipe/framework/formats:classification_cc_proto",
+        "//mediapipe/framework/formats:video_stream_header",
+        "//mediapipe/framework/port:ret_check",
+        "//mediapipe/framework/port:status",
+        "//mediapipe/framework/port:statusor",
+        "//mediapipe/util:color_cc_proto",
+        "//mediapipe/util:render_data_cc_proto",
+        "@com_google_absl//absl/strings",
+    ],
+    alwayslink = 1,
+)
+
+cc_library(
     name = "rect_to_render_data_calculator",
     srcs = ["rect_to_render_data_calculator.cc"],
     visibility = ["//visibility:public"],
@@ -664,6 +714,22 @@ cc_library(
     alwayslink = 1,
 )
 
+cc_library(
+    name = "landmarks_to_floats_calculator",
+    srcs = ["landmarks_to_floats_calculator.cc"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":landmarks_to_floats_calculator_cc_proto",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:landmark_cc_proto",
+        "//mediapipe/framework/formats:matrix",
+        "//mediapipe/framework/port:ret_check",
+        "//mediapipe/framework/port:status",
+        "@eigen_archive//:eigen",
+    ],
+    alwayslink = 1,
+)
+
 cc_test(
     name = "detection_letterbox_removal_calculator_test",
     srcs = ["detection_letterbox_removal_calculator_test.cc"],
@@ -693,4 +759,91 @@ cc_test(
         "//mediapipe/framework/port:parse_text_proto",
         "//mediapipe/framework/tool:validate_type",
     ],
+)
+
+proto_library(
+    name = "top_k_scores_calculator_proto",
+    srcs = ["top_k_scores_calculator.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//mediapipe/framework:calculator_proto",
+    ],
+)
+
+mediapipe_cc_proto_library(
+    name = "top_k_scores_calculator_cc_proto",
+    srcs = ["top_k_scores_calculator.proto"],
+    cc_deps = [
+        "//mediapipe/framework:calculator_cc_proto",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":top_k_scores_calculator_proto"],
+)
+
+cc_library(
+    name = "top_k_scores_calculator",
+    srcs = ["top_k_scores_calculator.cc"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":top_k_scores_calculator_cc_proto",
+        "//mediapipe/framework/formats:classification_cc_proto",
+        "//mediapipe/framework/port:ret_check",
+        "//mediapipe/framework/port:status",
+        "//mediapipe/framework/port:statusor",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/util:resource_util",
+    ] + select({
+        "//mediapipe:android": [
+            "//mediapipe/util/android/file/base",
+        ],
+        "//mediapipe:apple": [
+            "//mediapipe/util/android/file/base",
+        ],
+        "//mediapipe:macos": [
+            "//mediapipe/framework/port:file_helpers",
+        ],
+        "//conditions:default": [
+            "//mediapipe/framework/port:file_helpers",
+        ],
+    }),
+    alwayslink = 1,
+)
+
+cc_test(
+    name = "top_k_scores_calculator_test",
+    srcs = ["top_k_scores_calculator_test.cc"],
+    deps = [
+        ":top_k_scores_calculator",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework:calculator_runner",
+        "//mediapipe/framework:packet",
+        "//mediapipe/framework/deps:message_matchers",
+        "//mediapipe/framework/port:gtest_main",
+        "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:status",
+    ],
+)
+
+mediapipe_cc_proto_library(
+    name = "labels_to_render_data_calculator_cc_proto",
+    srcs = ["labels_to_render_data_calculator.proto"],
+    cc_deps = [
+        "//mediapipe/framework:calculator_cc_proto",
+        "//mediapipe/util:color_cc_proto",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [":labels_to_render_data_calculator_proto"],
+)
+
+cc_library(
+    name = "local_file_contents_calculator",
+    srcs = ["local_file_contents_calculator.cc"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/port:file_helpers",
+        "//mediapipe/framework/port:ret_check",
+        "//mediapipe/framework/port:status",
+    ],
+    alwayslink = 1,
 )

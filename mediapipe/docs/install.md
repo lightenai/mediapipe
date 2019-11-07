@@ -24,7 +24,8 @@ Choose your operating system:
 To build and run Android apps:
 
 -   [Setting up Android SDK and NDK](#setting-up-android-sdk-and-ndk)
--   [Setting up Android Studio with MediaPipe](#setting-up-android-studio-with-mediapipe)
+-   [Using MediaPipe with Gradle](#using-mediapipe-with-gradle)
+-   [Using MediaPipe with Bazel](#using-mediapipe-with-bazel)
 
 To build and run iOS apps:
 
@@ -41,19 +42,11 @@ To build and run iOS apps:
     $ cd mediapipe
     ```
 
-2.  Install Bazel (0.24.1 and above required).
+2.  Install Bazel (version between 0.24.1 and 0.29.1).
 
-    Option 1. Use package manager tool to install the latest version of Bazel.
-
-    ```bash
-    $ sudo apt-get install bazel
-
-    # Run 'bazel version' to check version of bazel installed
-    ```
-
-    Option 2. Follow Bazel's
+    Follow the official
     [documentation](https://docs.bazel.build/versions/master/install-ubuntu.html)
-    to install any version of Bazel manually.
+    to install Bazel manually. Note that MediaPipe doesn't support Bazel 1.0.0+ yet.
 
 3.  Install OpenCV and FFmpeg.
 
@@ -75,10 +68,10 @@ To build and run iOS apps:
     [documentation](https://docs.opencv.org/3.4.6/d7/d9f/tutorial_linux_install.html)
     to manually build OpenCV from source code.
 
-    Note: You may need to modify [`WORKSAPCE`] and [`opencv_linux.BUILD`] to
+    Note: You may need to modify [`WORKSPACE`] and [`opencv_linux.BUILD`] to
     point MediaPipe to your own OpenCV libraries, e.g., if OpenCV 4 is installed
     in "/usr/local/", you need to update the "linux_opencv" new_local_repository
-    rule in [`WORKSAPCE`] and "opencv" cc_library rule in [`opencv_linux.BUILD`]
+    rule in [`WORKSPACE`] and "opencv" cc_library rule in [`opencv_linux.BUILD`]
     like the following:
 
     ```bash
@@ -107,12 +100,32 @@ To build and run iOS apps:
     )
     ```
 
-4.  Run the [Hello World desktop example](./hello_world_desktop.md).
+4.  For running desktop examples on Linux only (not on OS X) with GPU
+    acceleration.
+
+    ```bash
+    # Requires a GPU with EGL driver support.
+    # Can use mesa GPU libraries for desktop, (or Nvidia/AMD equivalent).
+    sudo apt-get install mesa-common-dev libegl1-mesa-dev libgles2-mesa-dev
+
+    # To compile with GPU support, replace
+    --define MEDIAPIPE_DISABLE_GPU=1
+    # with
+    --copt -DMESA_EGL_NO_X11_HEADERS
+    # when building GPU examples.
+    ```
+
+5.  Run the [Hello World desktop example](./hello_world_desktop.md).
 
     ```bash
     $ export GLOG_logtostderr=1
-    # Need bazel flag 'MEDIAPIPE_DISABLE_GPU=1' as desktop GPU is currently not supported
+
+    # if you are running on Linux desktop with CPU only
     $ bazel run --define MEDIAPIPE_DISABLE_GPU=1 \
+        mediapipe/examples/desktop/hello_world:hello_world
+
+    # If you are running on Linux desktop with GPU support enabled (via mesa drivers)
+    $ bazel run --copt -DMESA_EGL_NO_X11_HEADERS \
         mediapipe/examples/desktop/hello_world:hello_world
 
     # Should print:
@@ -139,11 +152,11 @@ To build and run iOS apps:
     $ cd mediapipe
     ```
 
-2.  Install Bazel (0.24.1 and above required).
+2.  Install Bazel (version between 0.24.1 and 0.29.1).
 
-    Follow Bazel's
+    Follow the official
     [documentation](https://docs.bazel.build/versions/master/install-redhat.html)
-    to install Bazel manually.
+    to install Bazel manually. Note that MediaPipe doesn't support Bazel 1.0.0+ yet.
 
 3.  Install OpenCV.
 
@@ -158,10 +171,10 @@ To build and run iOS apps:
 
     Option 2. Build OpenCV from source code.
 
-    Note: You may need to modify [`WORKSAPCE`] and [`opencv_linux.BUILD`] to
+    Note: You may need to modify [`WORKSPACE`] and [`opencv_linux.BUILD`] to
     point MediaPipe to your own OpenCV libraries, e.g., if OpenCV 4 is installed
     in "/usr/local/", you need to update the "linux_opencv" new_local_repository
-    rule in [`WORKSAPCE`] and "opencv" cc_library rule in [`opencv_linux.BUILD`]
+    rule in [`WORKSPACE`] and "opencv" cc_library rule in [`opencv_linux.BUILD`]
     like the following:
 
     ```bash
@@ -194,7 +207,7 @@ To build and run iOS apps:
 
     ```bash
     $ export GLOG_logtostderr=1
-    # Need bazel flag 'MEDIAPIPE_DISABLE_GPU=1' as desktop GPU is currently not supported
+    # Need bazel flag 'MEDIAPIPE_DISABLE_GPU=1' if you are running on Linux desktop with CPU only
     $ bazel run --define MEDIAPIPE_DISABLE_GPU=1 \
         mediapipe/examples/desktop/hello_world:hello_world
 
@@ -217,7 +230,7 @@ To build and run iOS apps:
 
     *   Install [Homebrew](https://brew.sh).
     *   Install [Xcode](https://developer.apple.com/xcode/) and its Command Line
-        Tools.
+        Tools by `xcode-select install`.
 
 2.  Checkout MediaPipe repository.
 
@@ -227,19 +240,24 @@ To build and run iOS apps:
     $ cd mediapipe
     ```
 
-3.  Install Bazel (0.24.1 and above required).
+3.  Install Bazel (version between 0.24.1 and 0.29.1).
 
-    Option 1. Use package manager tool to install the latest version of Bazel.
+     Option 1. Use package manager tool to install Bazel 0.29.1
 
     ```bash
-    $ brew install bazel
+    # If Bazel 1.0.0+ was installed.
+    $ brew uninstall bazel
+
+    # Install Bazel 0.29.1
+    $ brew install https://raw.githubusercontent.com/bazelbuild/homebrew-tap/223ffb570c21c0a2af251afc6df9dec0214c6e74/Formula/bazel.rb
+    $ brew link bazel
 
     # Run 'bazel version' to check version of bazel installed
     ```
 
-    Option 2. Follow Bazel's
+    Option 2. Follow the official
     [documentation](https://docs.bazel.build/versions/master/install-os-x.html#install-with-installer-mac-os-x)
-    to install any version of Bazel manually.
+    to install Bazel manually. Note that MediaPipe doesn't support Bazel 1.0.0+ yet.
 
 4.  Install OpenCV and FFmpeg.
 
@@ -261,7 +279,7 @@ To build and run iOS apps:
     $ port install opencv
     ```
 
-    Note: when using MacPorts, please edit the [`WORKSAPCE`],
+    Note: when using MacPorts, please edit the [`WORKSPACE`],
     [`opencv_macos.BUILD`], and [`ffmpeg_macos.BUILD`] files like the following:
 
     ```bash
@@ -399,10 +417,10 @@ To build and run iOS apps:
     [documentation](https://docs.opencv.org/3.4.6/d7/d9f/tutorial_linux_install.html)
     to manually build OpenCV from source code.
 
-    Note: You may need to modify [`WORKSAPCE`] and [`opencv_linux.BUILD`] to
+    Note: You may need to modify [`WORKSPACE`] and [`opencv_linux.BUILD`] to
     point MediaPipe to your own OpenCV libraries, e.g., if OpenCV 4 is installed
     in "/usr/local/", you need to update the "linux_opencv" new_local_repository
-    rule in [`WORKSAPCE`] and "opencv" cc_library rule in [`opencv_linux.BUILD`]
+    rule in [`WORKSPACE`] and "opencv" cc_library rule in [`opencv_linux.BUILD`]
     like the following:
 
     ```bash
@@ -561,6 +579,11 @@ export ANDROID_HOME=<path to the Android SDK>
 export ANDROID_NDK_HOME=<path to the Android NDK>
 ```
 
+In order to use MediaPipe on earlier Android versions, MediaPipe needs to switch
+to a lower Android API level. You can achieve this by specifying `api_level =
+<api level integer>` in android_ndk_repository() and/or android_sdk_repository()
+in the [`WORKSPACE`] file.
+
 Please verify all the necessary packages are installed.
 
 *   Android SDK Platform API Level 28 or 29
@@ -569,10 +592,20 @@ Please verify all the necessary packages are installed.
 *   Android SDK Tools 26.1.1
 *   Android NDK 17c or above
 
-### Setting up Android Studio with MediaPipe
+### Using MediaPipe with Gradle
 
-The steps below use Android Studio 3.5 to build and install a MediaPipe example
-app.
+MediaPipe can be used within an existing project, such as a Gradle project,
+using the MediaPipe AAR target defined in mediapipe_aar.bzl. Please see the
+separate [MediaPipe Android Archive Library](./android_archive_library.md)
+documentation.
+
+### Using MediaPipe with Bazel
+
+The MediaPipe project can be imported to Android Studio using the Bazel plugins.
+This allows the MediaPipe examples and demos to be built and modified in Android
+Studio. To incorporate MediaPipe into an existing Android Studio project, see:
+"Using MediaPipe with Gradle". The steps below use Android Studio 3.5 to build
+and install a MediaPipe example app.
 
 1.  Install and launch Android Studio 3.5.
 
@@ -662,7 +695,7 @@ app.
     *   Press the `[+]` button to add the new configuration.
     *   Select `Run` to run the example app on the connected Android device.
 
-[`WORKSAPCE`]: https://github.com/google/mediapipe/tree/master/WORKSPACE
+[`WORKSPACE`]: https://github.com/google/mediapipe/tree/master/WORKSPACE
 [`opencv_linux.BUILD`]: https://github.com/google/mediapipe/tree/master/third_party/opencv_linux.BUILD
 [`opencv_macos.BUILD`]: https://github.com/google/mediapipe/tree/master/third_party/opencv_macos.BUILD
 [`ffmpeg_macos.BUILD`]:https://github.com/google/mediapipe/tree/master/third_party/ffmpeg_macos.BUILD

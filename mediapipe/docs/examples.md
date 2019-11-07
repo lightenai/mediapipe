@@ -51,6 +51,15 @@ and model details are described in the
 *   [Android](./face_detection_mobile_gpu.md)
 *   [iOS](./face_detection_mobile_gpu.md)
 
+### Face Detection with CPU
+
+[Face Detection with CPU](./face_detection_mobile_cpu.md) illustrates using the
+same TFLite model in a CPU-based pipeline. This example highlights how graphs
+can be easily adapted to run on CPU v.s. GPU.
+
+*   [Android](./face_detection_mobile_cpu.md)
+*   [iOS](./face_detection_mobile_cpu.md)
+
 ### Hand Detection with GPU
 
 [Hand Detection with GPU](./hand_detection_mobile_gpu.md) illustrates how to use
@@ -87,8 +96,9 @@ using the MediaPipe C++ APIs.
 
 ### Feature Extration for YouTube-8M Challenge
 
-[Feature Extration for YouTube-8M Challenge](./youtube_8m.md) shows how to use
-MediaPipe to prepare training data for the YouTube-8M Challenge.
+[Feature Extration and Model Inference for YouTube-8M Challenge](./youtube_8m.md)
+shows how to use MediaPipe to prepare training data for the YouTube-8M Challenge
+and do the model inference with the baseline model.
 
 ### Preparing Data Sets with MediaSequence
 
@@ -103,3 +113,29 @@ object detection models (TensorFlow and TFLite) using the MediaPipe C++ APIs.
 
 [Sobel edge detection]:https://en.wikipedia.org/wiki/Sobel_operator
 [CameraX]:https://developer.android.com/training/camerax
+
+### Face Detection on Desktop with Webcam
+
+[Face Detection on Desktop with Webcam](./face_detection_desktop.md) shows how
+to use MediaPipe with a TFLite model for face detection on desktop using CPU or
+GPU with live video from a webcam.
+
+*   [Desktop GPU](./face_detection_desktop.md)
+*   [Desktop CPU](./face_detection_desktop.md)
+
+### Hand Tracking on Desktop with Webcam
+
+[Hand Tracking on Desktop with Webcam](./hand_tracking_desktop.md) shows how to
+use MediaPipe with a TFLite model for hand tracking on desktop using CPU or GPU
+with live video from a webcam.
+
+*   [Desktop GPU](./hand_tracking_desktop.md)
+*   [Desktop CPU](./hand_tracking_desktop.md)
+
+### Hair Segmentation on Desktop with Webcam
+
+[Hair Segmentation on Desktop with Webcam](./hair_segmentation_desktop.md) shows
+how to use MediaPipe with a TFLite model for hair segmentation on desktop using
+GPU with live video from a webcam.
+
+*   [Desktop GPU](./hair_segmentation_desktop.md)

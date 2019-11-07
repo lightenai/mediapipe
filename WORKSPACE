@@ -10,7 +10,8 @@ http_archive(
     sha256 = "2ef429f5d7ce7111263289644d233707dba35e39696377ebab8b0bc701f7818e",
 )
 load("@bazel_skylib//lib:versions.bzl", "versions")
-versions.check(minimum_bazel_version = "0.24.1")
+versions.check(minimum_bazel_version = "0.24.1",
+               maximum_bazel_version = "0.29.1")
 
 # ABSL cpp library.
 http_archive(
@@ -64,6 +65,12 @@ http_archive(
     sha256 = "267103f8a1e9578978aa1dc256001e6529ef593e5aea38193d31c2872ee025e8",
     strip_prefix = "glog-0.3.5",
     build_file = "@//third_party:glog.BUILD",
+    patches = [
+        "@//third_party:com_github_glog_glog_9779e5ea6ef59562b030248947f787d1256132ae.diff"
+    ],
+    patch_args = [
+        "-p1",
+    ],
 )
 
 # libyuv

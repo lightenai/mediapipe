@@ -688,6 +688,12 @@ cc_library(
 cc_library(
     name = "demangle",
     hdrs = ["demangle.h"],
+    defines = select({
+        "//mediapipe/framework/profiler:android_release": [
+            "MEDIAPIPE_HAS_CXA_DEMANGLE=0",
+        ],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
 )
 
@@ -1134,6 +1140,7 @@ cc_library(
         "//mediapipe/framework/port:status",
         "//mediapipe/framework/port:statusor",
         "//mediapipe/framework/tool:calculator_graph_template_cc_proto",
+        "//mediapipe/framework/tool:options_util",
         "//mediapipe/framework/tool:template_expander",
         "@com_google_absl//absl/base:core_headers",
         "@com_google_absl//absl/memory",
@@ -1499,13 +1506,47 @@ cc_test(
     deps = [
         ":calculator_context",
         ":calculator_framework",
+        ":test_calculators",
+        ":thread_pool_executor",
         ":timestamp",
+        ":type_map",
+        "//mediapipe/calculators/core:counting_source_calculator",
+        "//mediapipe/calculators/core:mux_calculator",
         "//mediapipe/calculators/core:pass_through_calculator",
         "//mediapipe/framework/port:gtest_main",
         "//mediapipe/framework/port:logging",
         "//mediapipe/framework/port:parse_text_proto",
         "//mediapipe/framework/port:status",
+        "//mediapipe/framework/stream_handler:barrier_input_stream_handler",
+        "//mediapipe/framework/stream_handler:early_close_input_stream_handler",
+        "//mediapipe/framework/stream_handler:fixed_size_input_stream_handler",
         "//mediapipe/framework/stream_handler:immediate_input_stream_handler",
+        "//mediapipe/framework/stream_handler:mux_input_stream_handler",
+        "//mediapipe/framework/tool:sink",
+    ],
+)
+
+cc_test(
+    name = "calculator_graph_side_packet_test",
+    size = "small",
+    srcs = [
+        "calculator_graph_side_packet_test.cc",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":calculator_framework",
+        ":test_calculators",
+        "//mediapipe/calculators/core:counting_source_calculator",
+        "//mediapipe/calculators/core:mux_calculator",
+        "//mediapipe/calculators/core:pass_through_calculator",
+        "//mediapipe/framework:calculator_cc_proto",
+        "//mediapipe/framework/port:gtest_main",
+        "//mediapipe/framework/port:logging",
+        "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:ret_check",
+        "//mediapipe/framework/port:status",
+        "//mediapipe/framework/tool:sink",
+        "@com_google_absl//absl/time",
     ],
 )
 
@@ -1677,4 +1718,11 @@ cc_test(
         "//mediapipe/framework/tool:sink",
         "//mediapipe/framework/tool/testdata:dub_quad_test_subgraph",
     ],
+)
+
+# Expose the proto source files for building mediapipe AAR.
+filegroup(
+    name = "protos_src",
+    srcs = glob(["*.proto"]),
+    visibility = ["//mediapipe:__subpackages__"],
 )
