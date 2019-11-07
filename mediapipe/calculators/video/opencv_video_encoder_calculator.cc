@@ -147,6 +147,10 @@ class OpenCvVideoEncoderCalculator : public CalculatorBase {
              << "Unsupported image format: " << format;
     }
   }
+  cv::Mat tmp;
+  cv::resize(frame, tmp, cv::Size(frame.cols/3, frame.rows/3));
+  cv::imshow("frame", tmp);
+  cv::waitKey(1);
   writer_->write(frame);
   return ::mediapipe::OkStatus();
 }
